@@ -1,0 +1,25 @@
+{
+    "root": true,
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 2023, // or the ECMAScript version you prefer
+      "sourceType": "module"
+    },
+    "extends": [
+      "@nuxtjs",
+      "plugin:nuxt/recommended",
+      "prettier",
+      "prettier/vue",
+      "plugin:prettier/recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "plugins": ["@typescript-eslint"],
+    "rules": {
+      // Add custom rules or overrides here
+    }
+  }
+  

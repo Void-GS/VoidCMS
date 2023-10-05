@@ -1,0 +1,108 @@
+version: '3.8'
+
+volumes:
+  nginx-certs:
+  nginx-vhost:
+  nginx-html:
+  voidcms-storage:
+  voidcms-files:
+  database:
+
+services:
+  nginx-proxy:
+    container_name: 'nginx-proxy'
+    build:
+      context: proxy
+      dockerfile: Dockerfile
+    image: jwilder/nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: ""
+    environment:
+      # - DHPARAM_GENERATION=false
+      - CLIENT_MAX_BODY_SIZE=320m
+    volumes:
+      - ~/voidcms-storage/nginx-certs:/etc/nginx/certs:rw
+      - ~/voidcms-storage/nginx-vhost:/etc/nginx/vhost.d:rw
+      - ~/voidcms-storage/nginx-html:/usr/share/nginx/html:rw
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - internal
+
+  letsencrypt-nginx-proxy-companion:
+    container_name: 'letencrypt-proxy'
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: unless-stopped
+    volumes:
+      - ~/voidcms-storage/nginx-certs:/etc/nginx/certs:rw 
+      - ~/voidcms-storage/nginx-vhost:/etc/nginx/vhost.d
+      - ~/voidcms-storage/nginx-html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - internal
+
+  voidcms-frontend:
+    build:
+      context: frontend
+      dockerfile: ./docker/Dockerfile
+    container_name: 'voidcms-frontend'
+    restart: unless-stopped
+    # ports:
+    #   - "8080:8080"
+    expose:
+      - 3000
+    volumes:
+      - ~/voidcms-storage/voidcms-files:/frontend/.output/public/files:ro
+    environment:
+      # Nuxt env
+      - NUXT_PUBLIC_API="https://api.voidcms.app"
+      - NUXT_PUBLIC_MEDIA="https://api.voidcms.app"
+      - NUXT_PUBLIC_HCAPTCHA="10000000-ffff-ffff-ffff-000000000001" # Demo HCaptcha Key from https://docs.hcaptcha.com/
+      # Nginx env
+      - VIRTUAL_HOST=voidcms.ru
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_PROTO=http
+      # LetsEncrypt env
+      - LETSENCRYPT_HOST=voidcms.app
+      - LETSENCRYPT_EMAIL=voidcms.app@gmail.com
+    networks:
+      - internal
+
+
+  void-backend:
+    build:
+      context: backend
+      dockerfile: ./docker/Dockerfile
+    container_name: 'voidcms-backend'
+    restart: on-failure
+    # ports:
+    #   - "8000:8000"
+    expose:
+      - 8000
+    # depends_on:
+    #   - ermapostgres
+    environment:
+      # Django env
+      - ALLOWED_HOSTS=api.voidcms.app,localhost
+      - CORS_ALLOWED_ORIGINS=https://voidcms.app,http://voidcms.app
+      - SECRET_KEY=my$3cr3tK3y#f0rY0urDj@ngoPr0j3ct&2$23^!1k9z # You need to generate your own key
+      # Nginx env
+      - VIRTUAL_HOST=api.voidcms.app
+      - VIRTUAL_PORT=8000
+      - VIRTUAL_PROTO=http
+      # LetsEncrypt env
+      - LETSENCRYPT_HOST=api.voidcms.app
+      - LETSENCRYPT_EMAIL=voidcms.app@gmail.com
+    volumes:
+      - ~/voidcms-storage/database:/backend/database:rw
+      - ~/voidcms-storage/voidcms-files:/backend/files:rw
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+    external: false
