@@ -1,8 +1,8 @@
 
-![VoidCMS - easy e-commerce template](https://gitlab.com/ostrovskiy/voidcms-beta/-/raw/master/frontend/public/logo.png){width=350px}
+![VoidCMS - easy e-commerce template](https://github.com/VoidCMS/VoidCMS/blob/master/frontend/public/logo.png?raw=true){width=350px}
 
   
-  
+  https://github.com/VoidCMS/VoidCMS/blob/master/frontend/public/logo.png?raw=true
 
 # # VoidCms Public Beta v0.9.3.1 (work in progesss)
 
