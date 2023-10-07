@@ -6,7 +6,7 @@
 **VoidCms / e-commerce** - Simple django/nuxt e-commerce, easy extendable content management system supports PSQL, SQLite
 
 ## Features:
-> _
+> 
 >  1. **Products (with complectations):** This feature remains at the top, as it's crucial for displaying and managing the products you want
 > to    sell.
 >    
@@ -48,7 +48,7 @@
 >    15.  **Multi-Domain Support (work in progress):** If you plan to expand to multiple domains, it's important but can be a lower   
 > priority until you're ready to implement it.
 >
-> _
+> 
 
 ## Warning
 
